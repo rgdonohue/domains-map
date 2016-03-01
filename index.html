@@ -35,7 +35,7 @@
             font-stretch: expanded;
             position: absolute;
             top: 4px;
-            right: 20px;
+            left: 20px;
             z-index: 2;
             text-transform: capitalize;
             font-family: "Jacques Francois Shadow";
@@ -53,14 +53,24 @@
             bottom: 0;
             background: rgba(61, 61, 61, .6);
         }
-        #output {
+        .output {
             position: absolute;
-            width: 20%;
             top: 100px;
-            left: 100px;
-            bottom: 100px;
-            background-color: darkslategray;
+            bottom: 10px;
+            width: 20%;
+            color: whitesmoke;
             overflow-y: scroll;
+            overflow-x: hidden;
+        }
+        .output-left {
+            left: 15px;
+            text-align: right;
+        }
+        .output-right {
+            right: 15px;
+        }
+        .output ul {
+          list-style-type: none;
         }
         svg {
           position: absolute;
@@ -71,11 +81,12 @@
           clip-path: circle(30% at center);
           -webkit-clip-path: circle(30% at center);
         }
-
+        .mapboxgl-canvas-container.mapboxgl-interactive, .mapboxgl-ctrl-nav-compass {
+           cursor: pointer;
+        }
         button {
             position: absolute;
             z-index: 2;
-            left: 20px;
             padding: 8px 4px;
             font-size: 1.2em;
             width: 100px;
@@ -84,16 +95,24 @@
             font-family: "Special Elite", sans-serif;
             color: floralwhite;
         }
+        button:hover {
+            border: 2px yellow groove; 
+            cursor: pointer;
+        }
         #nyc {
             top: 20px;
+            right: 260px;
             background: #074f82;
+            
         }
         #london {
-            top: 70px;
+            top: 20px;
+            right: 140px;
             background: #c78d28;
         }
         #berlin {
-            top: 120px;
+            top: 20px;
+            right: 20px;
             background: #a81a18;
         }
 
@@ -105,10 +124,8 @@
     <h1>top level domain names</h1>
     <div id='map'></div>
 <!--    <div id='mask'></div>-->
-    <div id='output'>
-      <ul>
-      </ul>
-    </div>
+    <div class='output output-left'><ul></ul></div>
+    <div class='output output-right'><ul></ul></div>
     <button id="nyc">.nyc</button>
     <button id="london">.london</button>
     <button id="berlin">.berlin</button>
@@ -128,10 +145,8 @@
           .defer(d3.json, 'nyc-hex-with-data.json')
           .await(function(error, json) {
             if (error) throw error;
-            //console.log("Goodbye!");
             drawMap(json);
           });
-            //drawMap();
     }
     
     function drawMap(data) {
@@ -160,10 +175,35 @@
                 'fill-opacity': 1
             }
           });
+          map.addLayer({
+            'id': 'hex-borders',
+            'type': 'line',
+            'source': 'nycHex',
+            'layout': {},
+            'paint': {
+              'line-color': 'rgba(157, 185, 159, .1)',
+              'line-width': 1
+            }
+            
+          });
+          map.addLayer({
+            'id': 'hex-hover',
+            'type': 'line',
+            'source': 'nycHex',
+            'layout': {},
+            'paint': {
+              'line-color': 'rgba(157, 185, 159, 1)',
+              'line-width': 1
+            },
+            'filter': ["==", "name", ""]
+            
+          });
           
         });
       
-        $ul = $('#output ul');
+        var $ulLeft = $('.output-left ul');
+        var $ulRight = $('.output-right ul');
+        
         var lastSame = '';
         map.on("mousemove", function(e) {
           
@@ -173,89 +213,45 @@
           }, function (err, features) {
             
             if (!err && features.length && features[0].properties.domains) {
-              
+              map.setFilter("hex-hover", ["==", "OBJECTID", features[0].properties.OBJETID]);
               if(features[0].properties.domains[0] != lastSame) {
-                $ul.html('');
-                for(var i = 0; i < features.length; i++) {
-                  for(var j = 0; j < features[i].properties.domains.length; j++) {
-                    $ul.append('<li>'+features[i].properties.domains[j]+'.nyc</li>');
+                  
+                  $ulLeft.html('');
+                  $ulRight.html('');
+                  for(var i = 0; i < features.length; i++) {
+                    for(var j = 0; j < features[i].properties.domains.length; j++) {
+                      if(j % 2 == 0) {
+                        $ulLeft.append('<li>'+features[i].properties.domains[j]+'.nyc</li>');
+                      } else {
+                        $ulRight.append('<li>'+features[i].properties.domains[j]+'.nyc</li>');
+                      } 
+                    }
                   }
-                }
-                lastSame = features[0].properties.domains[0];
-              } 
+                  lastSame = features[0].properties.domains[0];
+                } 
   
             } else {
-                $ul.html('');
+                $ulLeft.html('');
+                $ulRight.html('');
+                map.setFilter("hex-hover", ["==", "name", ""]);
             }
+          });
         });
-    });
         
-    
-//      
-//        var container = map.getCanvasContainer();
-//        var svg = d3.select(container).append("svg");
-//      
-//        var geoPath = d3.geo.path()
-//      
-//        svg.append("g")
-//          .selectAll("path")
-//          .data(data.features)
-//          .enter()
-//          .append("path")
-//          .attr( "d", geoPath )
-//          .attr("class","county")
-//          .on("mouseover", function(d){
-//              d3.select("h2").text(d.properties.NAME);
-//              d3.select(this).attr("class","county hover");
-//          })
-//          .on("mouseout", function(d){
-//              d3.select("h2").text("");
-//              d3.select(this).attr("class","county");
-//          });       
       
-       
-       
-      
-//        map.addControl(new mapboxgl.Navigation());
-//      
-//        if(map.loaded == true) {
-//          console.log('is true')
-//        } else {
-//          console.log('not true');
-//        }
-//        while(true) {
-//          console.log('waiting');
-//        }
-//        var sourceObj = new mapboxgl.GeoJSONSource({ data: hexNyc });
-//        map.addSource('nyc-hex', sourceObj); // add
-
-          //map.addSource('nyc-hex', data);
-
-//        map.on('mousemove', function (e) {
-//            map.featuresAt(e.point, {
-//              radius: 5, 
-//              layers: ["nyc-hex-with-data"]
-//            }, function (err, features) {
-//                if (err) throw err;
-//                console.log(JSON.stringify(features, null, 2));
-//            });
-//        });
-      
-      
-      
-        addNavigation(map);
+      addNavigation(map);
         
     } // end drawMap()
     
     function addNavigation(map) {
         
         $('#nyc').click(function() {
-           // $('#map').removeClass('clip-circle');
+           $('#map').removeClass('clip-circle');
             map.flyTo({
                 center: [-74.01, 40.71],
                 zoom: 10
             });
-           // $('#map').addClass('clip-circle');
+           $('#map').addClass('clip-circle custom-cursor');
         });
         $('#london').click(function() {
             $('#map').removeClass('clip-circle');
