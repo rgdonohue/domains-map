@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Domains</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.14.1/mapbox-gl.js'></script>
+    <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<!--    <script src="https://d3js.org/d3-queue.v2.min.js"></script>-->
+    <script src="http://d3js.org/queue.v1.min.js"></script>
+    <script src='https://code.jquery.com/jquery-1.12.0.min.js'></script>
+    
+    
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.14.1/mapbox-gl.css' rel='stylesheet' />
+    <link href='https://fonts.googleapis.com/css?family=Special+Elite' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Josefin+Slab:400,600' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Jacques+Francois+Shadow' rel='stylesheet' type='text/css'>
+    
+    <style>
+        html, body { 
+            width: 100%; 
+            height: 100%; 
+            margin:0; 
+            padding:0; 
+            background: #1f1f1f; 
+            font-family: "Special Elite", sans-serif; 
+        }
+        h1 {
+            font-size: 1.9em;
+            color: #9db99f;
+            background: #627f69;
+            padding: 3px 6px;
+            border: 2px solid #7b917d;
+            border-radius: 3px;
+            font-stretch: expanded;
+            position: absolute;
+            top: 4px;
+            right: 20px;
+            z-index: 2;
+            text-transform: capitalize;
+            font-family: "Jacques Francois Shadow";
+        }
+        #map { 
+            position:absolute; 
+            top:0; 
+            bottom:0; 
+            width:100%;  
+        }
+        #mask {
+            position: absolute;
+            width: 100%;
+            top: 0;
+            bottom: 0;
+            background: rgba(61, 61, 61, .6);
+        }
+        #output {
+            position: absolute;
+            width: 20%;
+            top: 100px;
+            left: 100px;
+            bottom: 100px;
+            background-color: darkslategray;
+            overflow-y: scroll;
+        }
+        svg {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+        }
+        .clip-circle {
+          clip-path: circle(30% at center);
+          -webkit-clip-path: circle(30% at center);
+        }
+
+        button {
+            position: absolute;
+            z-index: 2;
+            left: 20px;
+            padding: 8px 4px;
+            font-size: 1.2em;
+            width: 100px;
+            border: 2px white groove; 
+            border-radius: 3px;
+            font-family: "Special Elite", sans-serif;
+            color: floralwhite;
+        }
+        #nyc {
+            top: 20px;
+            background: #074f82;
+        }
+        #london {
+            top: 70px;
+            background: #c78d28;
+        }
+        #berlin {
+            top: 120px;
+            background: #a81a18;
+        }
+
+        
+        
+    </style>
+</head>
+<body>
+    <h1>top level domain names</h1>
+    <div id='map'></div>
+<!--    <div id='mask'></div>-->
+    <div id='output'>
+      <ul>
+      </ul>
+    </div>
+    <button id="nyc">.nyc</button>
+    <button id="london">.london</button>
+    <button id="berlin">.berlin</button>
+
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1Ijoicmdkb25vaHVlIiwiYSI6ImNpa211bWxhZDBzcTR1ZG02MmJsMG0wMTAifQ.WXFp5PSYSxKPz58rdkdS7Q';
+    
+    if (!mapboxgl.supported()) {
+        alert('Your browser does not support Mapbox GL');
+    } else {
+        loadData();
+    }
+  
+    function loadData() {
+      
+        queue()
+          .defer(d3.json, 'nyc-hex-with-data.json')
+          .await(function(error, json) {
+            if (error) throw error;
+            //console.log("Goodbye!");
+            drawMap(json);
+          });
+            //drawMap();
+    }
+    
+    function drawMap(data) {
+        
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/rgdonohue/cihje6km800twrom4lkfdtfxv',
+            center: [-40,50],
+            zoom: 3
+        });
+        
+        map.on('style.load', function () {
+          map.addSource('nycHex', {
+            'type': 'geojson',
+              'data': data
+          });
+          
+          map.addLayer({
+            'id': 'nyc-hex',
+            'type': 'fill',
+            'source': 'nycHex',
+            'layout': {},
+            'interactive': true,
+            'paint': {
+                'fill-color': 'rgba(255, 255, 0, 0)',
+                'fill-opacity': 1
+            }
+          });
+          
+        });
+      
+        $ul = $('#output ul');
+        var lastSame = '';
+        map.on("mousemove", function(e) {
+          
+          map.featuresAt(e.point, {
+            radius: .1,
+            layer: ["nyc-hex"]
+          }, function (err, features) {
+            
+            if (!err && features.length && features[0].properties.domains) {
+              
+              if(features[0].properties.domains[0] != lastSame) {
+                $ul.html('');
+                for(var i = 0; i < features.length; i++) {
+                  for(var j = 0; j < features[i].properties.domains.length; j++) {
+                    $ul.append('<li>'+features[i].properties.domains[j]+'.nyc</li>');
+                  }
+                }
+                lastSame = features[0].properties.domains[0];
+              } 
+  
+            } else {
+                $ul.html('');
+            }
+        });
+    });
+        
+    
+//      
+//        var container = map.getCanvasContainer();
+//        var svg = d3.select(container).append("svg");
+//      
+//        var geoPath = d3.geo.path()
+//      
+//        svg.append("g")
+//          .selectAll("path")
+//          .data(data.features)
+//          .enter()
+//          .append("path")
+//          .attr( "d", geoPath )
+//          .attr("class","county")
+//          .on("mouseover", function(d){
+//              d3.select("h2").text(d.properties.NAME);
+//              d3.select(this).attr("class","county hover");
+//          })
+//          .on("mouseout", function(d){
+//              d3.select("h2").text("");
+//              d3.select(this).attr("class","county");
+//          });       
+      
+       
+       
+      
+//        map.addControl(new mapboxgl.Navigation());
+//      
+//        if(map.loaded == true) {
+//          console.log('is true')
+//        } else {
+//          console.log('not true');
+//        }
+//        while(true) {
+//          console.log('waiting');
+//        }
+//        var sourceObj = new mapboxgl.GeoJSONSource({ data: hexNyc });
+//        map.addSource('nyc-hex', sourceObj); // add
+
+          //map.addSource('nyc-hex', data);
+
+//        map.on('mousemove', function (e) {
+//            map.featuresAt(e.point, {
+//              radius: 5, 
+//              layers: ["nyc-hex-with-data"]
+//            }, function (err, features) {
+//                if (err) throw err;
+//                console.log(JSON.stringify(features, null, 2));
+//            });
+//        });
+      
+      
+      
+        addNavigation(map);
+        
+    } // end drawMap()
+    
+    function addNavigation(map) {
+        
+        $('#nyc').click(function() {
+           // $('#map').removeClass('clip-circle');
+            map.flyTo({
+                center: [-74.01, 40.71],
+                zoom: 10
+            });
+           // $('#map').addClass('clip-circle');
+        });
+        $('#london').click(function() {
+            $('#map').removeClass('clip-circle');
+            map.flyTo({
+                center: [-.13, 51.51],
+                zoom: 10
+            });
+            //$('#map').addClass('clip-circle');
+        });
+        $('#berlin').click(function() {
+            $('#map').removeClass('clip-circle');
+            map.flyTo({
+                center: [13.38, 52.51],
+                zoom: 10
+            });
+            
+            $('#map').addClass('clip-circle');
+        });
+        
+    } // end addNavigation()
+    
+    
+</script>
+
+</body>
+</html>
