@@ -139,19 +139,21 @@
         loadData();
     }
   
+    var currentDomain;
+  
     function loadData() {
       
         queue()
           .defer(d3.json, 'data/berlin_hex.json')
           .defer(d3.json, 'data/london_hex.json')
-          //.defer(d3.json, 'nyc_hex.json')
-          .await(function(error, berlin, london) {
+          .defer(d3.json, 'data/nyc_hex.json')
+          .await(function(error, berlin, london, nyc) {
             if (error) throw error;
-            drawMap(berlin, london);
+            drawMap(berlin, london, nyc);
           });
     }
     
-    function drawMap(berlinData, londonData) {
+    function drawMap(berlinData, londonData, nycData) {
         
         var map = new mapboxgl.Map({
             container: 'map',
@@ -162,47 +164,7 @@
         
         map.on('style.load', function () {
           
-          
-          
-          
-//          map.addSource('nycHex', {
-//            'type': 'geojson',
-//              'data': nycData
-//          });
-//
-//          map.addLayer({
-//            'id': 'nyc-hex',
-//            'type': 'fill',
-//            'source': 'nycHex',
-//            'layout': {},
-//            'interactive': true,
-//            'paint': {
-//                'fill-color': 'rgba(255, 255, 0, 0)',
-//                'fill-opacity': 1
-//            }
-//          });
-//          map.addLayer({
-//            'id': 'nyc-borders',
-//            'type': 'line',
-//            'source': 'nycHex',
-//            'layout': {},
-//            'paint': {
-//              'line-color': 'rgba(157, 185, 159, .1)',
-//              'line-width': 1
-//            }
-//
-//          });
-//          map.addLayer({
-//            'id': 'nyc-hover',
-//            'type': 'line',
-//            'source': 'nycHex',
-//            'layout': {},
-//            'paint': {
-//              'line-color': 'rgba(157, 185, 159, .5)',
-//              'line-width': 2
-//            },
-//            'filter': ["==", "name", ""]
-//          });
+          // add berlin
 
           map.addSource('berlinHex', {
             'type': 'geojson',
@@ -243,6 +205,7 @@
             'filter': ["==", "name", ""]
           });
           
+          // add london
           
           map.addSource('londonHex', {
             'type': 'geojson',
@@ -282,25 +245,67 @@
             },
             'filter': ["==", "name", ""]
           });
+          
+          // add new york
+          
+          map.addSource('nycHex', {
+            'type': 'geojson',
+              'data': nycData
+          });
+
+          map.addLayer({
+            'id': 'nyc-hex',
+            'type': 'fill',
+            'source': 'nycHex',
+            'layout': {},
+            'interactive': true,
+            'paint': {
+                'fill-color': 'rgba(255, 255, 0, 0)',
+                'fill-opacity': 1
+            }
+          });
+          map.addLayer({
+            'id': 'nyc-borders',
+            'type': 'line',
+            'source': 'nycHex',
+            'layout': {},
+            'paint': {
+              'line-color': 'rgba(157, 185, 159, .1)',
+              'line-width': 1
+            }
+
+          });
+          map.addLayer({
+            'id': 'nyc-hover',
+            'type': 'line',
+            'source': 'nycHex',
+            'layout': {},
+            'paint': {
+              'line-color': 'rgba(157, 185, 159, .5)',
+              'line-width': 2
+            },
+            'filter': ["==", "name", ""]
+          });
+          
+          
 
       }); // end map on load style
       
         var $ulLeft = $('.output-left ul');
         var $ulRight = $('.output-right ul');
       
-        var currentDomain = 'berlin-hex';
         
         var lastSame = '';
         map.on("mousemove", function(e) {
           
           map.featuresAt(e.point, {
             radius: .1,
-            layer: ["berlin-hex", "london-hex"]
+            layer: ["berlin-hex", "london-hex", "nyc-hex"]
           }, function (err, features) {
             
             if (!err && features.length && features[0].properties.domains) {
-              console.log(features);
-              //map.setFilter("hex-hover", ["==", "hex_id", features[0].properties.hex_id]);
+              
+              map.setFilter(currentDomain+"-hover", ["==", "hex_id", features[0].properties.hex_id]);
               if(features[0].properties.domains[0] != lastSame) {
                   
                   $ulLeft.html('');
@@ -318,7 +323,7 @@
             } else {
                 $ulLeft.html('');
                 $ulRight.html('');
-               // map.setFilter("hex-hover", ["==", "name", ""]);
+                map.setFilter(currentDomain+"-hover", ["==", "name", ""]);
             }
           });
         });
@@ -337,6 +342,8 @@
                 zoom: 10
             });
            $('#map').addClass('clip-circle custom-cursor');
+          
+            currentDomain = 'nyc';
         });
         $('#london').click(function() {
             $('#map').removeClass('clip-circle');
@@ -345,6 +352,8 @@
                 zoom: 10
             });
             $('#map').addClass('clip-circle');
+          
+            currentDomain = 'london';
         });
         $('#berlin').click(function() {
             $('#map').removeClass('clip-circle');
@@ -354,6 +363,8 @@
             });
             
             $('#map').addClass('clip-circle');
+          
+            currentDomain = 'berlin';
         });
         
     } // end addNavigation()

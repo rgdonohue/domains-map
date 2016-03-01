@@ -6,13 +6,13 @@ var turf = require( "turf" ),
 
 console.log('loading polygons');
 
-var hex = fs.readFileSync('nyc-hex.json');
+var hex = fs.readFileSync('nyc_hex_greater_3.geojson');
 
 hex = JSON.parse(hex);
 
 var din = [];
 csv
- .fromPath("nyc_domains_with_hexagonID.csv", {headers: true})
+ .fromPath("nyc_dots_hex_id.csv", {headers: true})
  .on("data", function(data){
      din.push(data); 
  })
@@ -25,16 +25,16 @@ var newObject = {};
 function gatherDots(data) {
     
     for(o in data) {
-      if(newObject[data[o].hexagonID]){
-        newObject[data[o].hexagonID].push(data[o].domain_);
+      if(newObject[data[o].hex_id]){
+        newObject[data[o].hex_id].push(data[o].domain);
       } else {
-        newObject[data[o].hexagonID] = [data[o].domain_];
+        newObject[data[o].hex_id] = [data[o].domain];
       }
     }
   
     for(var i = 0; i < hex.features.length; i++) {
   
-      var hexId = hex.features[i].properties.hexagonID;
+      var hexId = hex.features[i].properties.hex_id;
       
       hex.features[i].properties.domains = newObject[String(hexId)];
 
