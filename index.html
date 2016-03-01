@@ -181,7 +181,7 @@
             'source': 'nycHex',
             'layout': {},
             'paint': {
-              'line-color': 'rgba(157, 185, 159, .1)',
+              'line-color': 'rgba(157, 185, 159, 0)',
               'line-width': 1
             }
             
@@ -192,8 +192,8 @@
             'source': 'nycHex',
             'layout': {},
             'paint': {
-              'line-color': 'rgba(157, 185, 159, 1)',
-              'line-width': 1
+              'line-color': 'rgba(157, 185, 159, .5)',
+              'line-width': 2
             },
             'filter': ["==", "name", ""]
             
@@ -213,19 +213,18 @@
           }, function (err, features) {
             
             if (!err && features.length && features[0].properties.domains) {
-              map.setFilter("hex-hover", ["==", "OBJECTID", features[0].properties.OBJETID]);
+              
+              map.setFilter("hex-hover", ["==", "OBJECTID", features[0].properties.OBJECTID]);
               if(features[0].properties.domains[0] != lastSame) {
                   
                   $ulLeft.html('');
                   $ulRight.html('');
-                  for(var i = 0; i < features.length; i++) {
-                    for(var j = 0; j < features[i].properties.domains.length; j++) {
-                      if(j % 2 == 0) {
-                        $ulLeft.append('<li>'+features[i].properties.domains[j]+'.nyc</li>');
+                  for(var i = 0; i < features[0].properties.domains.length; i++) {
+                      if(i % 2 == 0) {
+                        $ulLeft.append('<li>'+features[0].properties.domains[i]+'.nyc</li>');
                       } else {
-                        $ulRight.append('<li>'+features[i].properties.domains[j]+'.nyc</li>');
+                        $ulRight.append('<li>'+features[0].properties.domains[i]+'.nyc</li>');
                       } 
-                    }
                   }
                   lastSame = features[0].properties.domains[0];
                 } 
