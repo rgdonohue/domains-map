@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset='utf-8' />
-    <title>Domains</title>
+    <title>Domains Dots</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.14.1/mapbox-gl.js'></script>
     <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
@@ -164,6 +164,20 @@
         
         map.on('style.load', function () {
           
+          var layerFill = {
+                'fill-color': 'rgba(255, 255, 0, 0)',
+                'fill-opacity': 1
+            },
+              layerLine = {
+              'line-color': 'rgba(157, 185, 159, .2)',
+              'line-width': .5
+            },
+              layerHover = {
+              'line-color': 'rgba(157, 185, 159, .6)',
+              'line-width': 2
+            };
+              
+          
           // add berlin
 
           map.addSource('berlinHex', {
@@ -177,20 +191,14 @@
             'source': 'berlinHex',
             'layout': {},
             'interactive': true,
-            'paint': {
-                'fill-color': 'rgba(255, 255, 0, 0)',
-                'fill-opacity': 1
-            }
+            'paint': layerFill
           });
           map.addLayer({
             'id': 'berlin-borders',
             'type': 'line',
             'source': 'berlinHex',
             'layout': {},
-            'paint': {
-              'line-color': 'rgba(157, 185, 159, .1)',
-              'line-width': 1
-            }
+            'paint': layerLine
 
           });
           map.addLayer({
@@ -198,10 +206,7 @@
             'type': 'line',
             'source': 'berlinHex',
             'layout': {},
-            'paint': {
-              'line-color': 'rgba(157, 185, 159, .5)',
-              'line-width': 2
-            },
+            'paint': layerHover,
             'filter': ["==", "name", ""]
           });
           
@@ -218,20 +223,14 @@
             'source': 'londonHex',
             'layout': {},
             'interactive': true,
-            'paint': {
-                'fill-color': 'rgba(255, 255, 0, 0)',
-                'fill-opacity': 1
-            }
+            'paint': layerFill
           });
           map.addLayer({
             'id': 'london-borders',
             'type': 'line',
             'source': 'londonHex',
             'layout': {},
-            'paint': {
-              'line-color': 'rgba(157, 185, 159, .1)',
-              'line-width': 1
-            }
+            'paint': layerLine
 
           });
           map.addLayer({
@@ -239,10 +238,7 @@
             'type': 'line',
             'source': 'londonHex',
             'layout': {},
-            'paint': {
-              'line-color': 'rgba(157, 185, 159, .5)',
-              'line-width': 2
-            },
+            'paint': layerHover,
             'filter': ["==", "name", ""]
           });
           
@@ -259,20 +255,14 @@
             'source': 'nycHex',
             'layout': {},
             'interactive': true,
-            'paint': {
-                'fill-color': 'rgba(255, 255, 0, 0)',
-                'fill-opacity': 1
-            }
+            'paint': layerFill
           });
           map.addLayer({
             'id': 'nyc-borders',
             'type': 'line',
             'source': 'nycHex',
             'layout': {},
-            'paint': {
-              'line-color': 'rgba(157, 185, 159, .1)',
-              'line-width': 1
-            }
+            'paint': layerLine
 
           });
           map.addLayer({
@@ -280,10 +270,7 @@
             'type': 'line',
             'source': 'nycHex',
             'layout': {},
-            'paint': {
-              'line-color': 'rgba(157, 185, 159, .5)',
-              'line-width': 2
-            },
+            'paint': layerHover,
             'filter': ["==", "name", ""]
           });
           
@@ -303,18 +290,20 @@
             layer: ["berlin-hex", "london-hex", "nyc-hex"]
           }, function (err, features) {
             
-            if (!err && features.length && features[0].properties.domains) {
+            if (!err && features.length) {
               
-              map.setFilter(currentDomain+"-hover", ["==", "hex_id", features[0].properties.hex_id]);
               if(features[0].properties.domains[0] != lastSame) {
+                  
+                  map.setFilter(currentDomain+"-hover", ["==", "hex_id", features[0].properties.hex_id]);
                   
                   $ulLeft.html('');
                   $ulRight.html('');
+                  
                   for(var i = 0; i < features[0].properties.domains.length; i++) {
                       if(i % 2 == 0) {
-                        $ulLeft.append('<li>'+features[0].properties.domains[i]+'</li>');
+                        $ulLeft.append('<li>'+features[0].properties.domains[i]+'.'+currentDomain+'</li>');
                       } else {
-                        $ulRight.append('<li>'+features[0].properties.domains[i]+'</li>');
+                        $ulRight.append('<li>'+features[0].properties.domains[i]+'.'+currentDomain+'</li>');
                       } 
                   }
                   lastSame = features[0].properties.domains[0];
@@ -323,7 +312,7 @@
             } else {
                 $ulLeft.html('');
                 $ulRight.html('');
-                map.setFilter(currentDomain+"-hover", ["==", "name", ""]);
+                //map.setFilter(currentDomain+"-hover", ["==", "name", ""]);
             }
           });
         });
