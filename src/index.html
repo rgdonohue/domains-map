@@ -6,15 +6,14 @@
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.14.1/mapbox-gl.js'></script>
     <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
-<!--    <script src="https://d3js.org/d3-queue.v2.min.js"></script>-->
     <script src="http://d3js.org/queue.v1.min.js"></script>
     <script src='https://code.jquery.com/jquery-1.12.0.min.js'></script>
     
     
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.14.1/mapbox-gl.css' rel='stylesheet' />
-    <link href='https://fonts.googleapis.com/css?family=Special+Elite' rel='stylesheet' type='text/css'>
+    
+  <link href='https://fonts.googleapis.com/css?family=Special+Elite' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Josefin+Slab:400,600' rel='stylesheet' type='text/css'>
-    <link href='https://fonts.googleapis.com/css?family=Jacques+Francois+Shadow' rel='stylesheet' type='text/css'>
     
     <style>
         html, body { 
@@ -23,22 +22,25 @@
             margin:0; 
             padding:0; 
             background: #1f1f1f; 
-            font-family: "Special Elite", sans-serif; 
+            font-family: "Josefin Slab", sans-serif; 
         }
         h1 {
-            font-size: 1.9em;
-            color: #9db99f;
-            background: #627f69;
-            padding: 3px 6px;
-            border: 2px solid #7b917d;
-            border-radius: 3px;
+            font-size: 1.55em;
+            color: floralwhite;
+            border-bottom: 3px solid floralwhite;
+            padding: 0 0 4px 0;
+            margin: 0;
             font-stretch: expanded;
             position: absolute;
-            top: 4px;
-            left: 20px;
+            top: 10px;
+            right: 20px;
             z-index: 2;
             text-transform: capitalize;
-            font-family: "Jacques Francois Shadow";
+            font-family: "Josefin Slab";
+        }
+        h1:hover {
+            background: #627f69;
+            cursor: pointer;
         }
         #map { 
             position:absolute; 
@@ -61,6 +63,7 @@
             color: whitesmoke;
             overflow-y: scroll;
             overflow-x: hidden;
+            font-family: "Special Elite", sans-serif;
         }
         .output-left {
             left: 15px;
@@ -78,6 +81,7 @@
           height: 100%;
         }
         .clip-circle {
+          opacity: 1;
           clip-path: circle(30% at center);
           -webkit-clip-path: circle(30% at center);
         }
@@ -90,30 +94,39 @@
             padding: 8px 4px;
             font-size: 1.2em;
             width: 100px;
-            border: 2px white groove; 
+            border: 2px floralwhite groove; 
             border-radius: 3px;
             font-family: "Special Elite", sans-serif;
             color: floralwhite;
+            top: 56px;
+            transition: padding 0.3s ease;
         }
         button:hover {
-            border: 2px yellow groove; 
             cursor: pointer;
         }
         #nyc {
-            top: 20px;
             right: 260px;
-            background: #074f82;
+            transition: background 0.1s ease;
+            background: rgb(7, 79, 130);
             
         }
+        #nyc:hover {
+          background: rgb(8, 95, 157);
+        }
         #london {
-            top: 20px;
             right: 140px;
-            background: #c78d28;
+            transition: background 0.1s ease;
+            background: rgb(199, 141, 10);
+        }
+        #london:hover {
+            background: rgb(215, 151, 40);
         }
         #berlin {
-            top: 20px;
             right: 20px;
-            background: #a81a18;
+            background: rgb(195, 30, 28);
+        }
+        #berlin:hover {
+          background: rgb(217, 34, 31);
         }
 
         
@@ -121,7 +134,7 @@
     </style>
 </head>
 <body>
-    <h1>top level domain names</h1>
+    <h1>new top level domain names</h1>
     <div id='map'></div>
 <!--    <div id='mask'></div>-->
     <div class='output output-left'><ul></ul></div>
@@ -158,8 +171,8 @@
         var map = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/rgdonohue/cihje6km800twrom4lkfdtfxv',
-            center: [-40,50],
-            zoom: 3
+            center: [-33,50],
+            zoom: 2.8
         });
         
         map.on('style.load', function () {
@@ -330,7 +343,7 @@
                 center: [-74.01, 40.71],
                 zoom: 10
             });
-           $('#map').addClass('clip-circle custom-cursor');
+           $('#map').addClass('clip-circle');
           
             currentDomain = 'nyc';
         });
@@ -354,6 +367,13 @@
             $('#map').addClass('clip-circle');
           
             currentDomain = 'berlin';
+        });
+        $('h1').click(function() {
+            map.flyTo({
+                center: [-40,50],
+                zoom: 3
+            });
+            $('#map').removeClass('clip-circle');
         });
         
     } // end addNavigation()
