@@ -182,7 +182,8 @@ and Explorer Engine</h1>
         var map = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/rgdonohue/cihje6km800twrom4lkfdtfxv',
-            center: [-73.989, 40.734]
+            center: [-73.989, 40.734],
+            zoom: 14
         });
 //        var sw = new mapboxgl.LngLat(-73.9876, 40.7661);
 //        var ne = new mapboxgl.LngLat(-73.9397, 40.8002);
@@ -196,7 +197,6 @@ and Explorer Engine</h1>
 //        ]], {maxZoom: 15});
 //        map.options.maxZoom = 15;
       
-          map.setZoom(14);
       
         loadData();
     }
