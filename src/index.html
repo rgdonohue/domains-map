@@ -14,6 +14,7 @@
     
   <link href='https://fonts.googleapis.com/css?family=Special+Elite' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Josefin+Slab:400,600' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Jacques+Francois+Shadow' rel='stylesheet' type='text/css'>
     
     <style>
       html, body { 
@@ -22,9 +23,19 @@
           margin:0; 
           padding:0; 
           background: #1f1f1f url(images/dark_wall.png); 
-          font-family: "Josefin Slab", sans-serif; 
+          font-family: "Josefin Slab", serif; 
       }
       h1 {
+        position: absolute;
+        top: 10px;
+        left: 15px;
+        z-index: 2;
+        color: white;
+        margin: 0;
+        max-width: 40%;
+        font-family: "Jacques Francois Shadow", "Josefin Slab", serif; 
+      }
+      h2 {
           font-size: 1.55em;
           color: floralwhite;
           border-bottom: 3px solid floralwhite;
@@ -38,7 +49,7 @@
           text-transform: capitalize;
           font-family: "Josefin Slab";
       }
-      h1:hover {
+      h2:hover {
           cursor: pointer;
       }
       #map { 
@@ -158,13 +169,11 @@
     </style>
 </head>
 <body>
-    <h1>new top level domain names</h1>
-<!--    <h1>Steampunk Geobrowser</h1>-->
-<!--
-  <h1>Professor Horacio Hornswaggle’s Etheral Cartometrical Gauge
+    <h1>Professor Horacio Hornswaggle’s Etheral Cartometrical Gauge
 and Explorer Engine</h1>
--->
-    <div id='map'></div>
+    <h2>new top level domain names</h2>
+
+    <div id='map' class='clip-circle'></div>
 <!--    <div id='mask'></div>-->
     <div class='output output-left'><ul></ul></div>
     <div class='output output-right'><ul></ul></div>
@@ -179,11 +188,13 @@ and Explorer Engine</h1>
         alert('Your browser does not support Mapbox GL');
     } else {
       
+        $('button').hide();
+      
         var map = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/rgdonohue/cihje6km800twrom4lkfdtfxv',
             center: [-73.989, 40.734],
-            zoom: 14
+            zoom: 12
         });
 //        var sw = new mapboxgl.LngLat(-73.9876, 40.7661);
 //        var ne = new mapboxgl.LngLat(-73.9397, 40.8002);
@@ -216,13 +227,12 @@ and Explorer Engine</h1>
     }
     
     function drawMap(berlinData, londonData, nycData) {
-        $('button').hide();
+        
       
         map.on('style.load', function () {
           
-        map.addControl(new mapboxgl.Navigation({position: 'top-left'}));
+          map.addControl(new mapboxgl.Navigation({position: 'top-left'}));
           
-         $('#map').addClass('clip-circle');
           map.flyTo({
               center: [ -73.989, 40.734],
               zoom: 11.89
@@ -231,9 +241,9 @@ and Explorer Engine</h1>
           $('#berlin').addClass('button-opaque');
           $('#london').addClass('button-opaque');
           $('#nyc').fadeIn(2000, function() {
+            console.log('this happened')
               $('#london').fadeIn(300, function() {
-                  $('#berlin').fadeIn(300, function() {
-                  });
+                  $('#berlin').fadeIn(300);
               });
               
           });
@@ -383,26 +393,27 @@ and Explorer Engine</h1>
               if (!err && features.length) {
 
                 if(features[0].properties.domains[0] != lastSame) {
+//                    console.log(features.length)
 
                     map.setFilter(currentDomain+"-hover", ["==", "hex_id", features[0].properties.hex_id]);
 
-                    $ulLeft.html('');
-                    $ulRight.html('');
-
-                    for(var i = 0; i < features[0].properties.domains.length; i++) {
-                        if(i % 2 == 0) {
-                          $ulLeft.append('<li>'+colorDomain(features[0].properties.domains[i])+'</li>');
-                        } else {
-                          $ulRight.append('<li>'+colorDomain(features[0].properties.domains[i])+'</li>');
-                        } 
-                    }
-                    lastSame = features[0].properties.domains[0];
-                  } 
+                      $ulLeft.html('');
+                      $ulRight.html('');
+//
+                      for(var i = 0; i < features[0].properties.domains.length; i++) {
+                          if(i % 2 == 0) {
+                            $ulLeft.append('<li>'+colorDomain(features[0].properties.domains[i])+'</li>');
+                          } else {
+                            $ulRight.append('<li>'+colorDomain(features[0].properties.domains[i])+'</li>');
+                          } 
+                      }
+                      lastSame = features[0].properties.domains[0];
+                    } 
 
               } else {
                   $ulLeft.html('');
                   $ulRight.html('');
-                  //map.setFilter(currentDomain+"-hover", ["==", "name", ""]);
+                  map.setFilter(currentDomain+"-hover", ["==", "name", ""]);
               }
             });
           } // end if hovering
