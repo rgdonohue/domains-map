@@ -14,9 +14,6 @@ function map() {
 //        maxZoom: 14
     });
     
-    var lilmap = new maboxgl.Map({
-        container: 'lilmap'
-    })
     map.addControl(new mapboxgl.Navigation({position: 'top-left'}));
 
     map.on('style.load', function () {
