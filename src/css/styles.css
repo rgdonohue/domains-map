@@ -40,14 +40,6 @@ h2:hover {
     bottom:0; 
     width:100%;  
 }
-#lilmap {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 30px;
-    height: 40px;
-    background: grey;
-}
 .output {
     position: absolute;
     top: 100px;

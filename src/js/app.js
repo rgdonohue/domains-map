@@ -1,4 +1,5 @@
-
+var $ulLeft = $('.output-left ul'),
+    $ulRight = $('.output-right ul');
 var map;
 var currentDomain;
 
@@ -9,9 +10,9 @@ function map() {
         style: 'mapbox://styles/rgdonohue/cihje6km800twrom4lkfdtfxv',
         center: [-73.989, 40.734],
         zoom: 12
-//        ,
-//        minZoom: 10,
-//        maxZoom: 14
+        ,
+        minZoom: 10,
+        maxZoom: 14
     });
     
     map.addControl(new mapboxgl.Navigation({position: 'top-left'}));
@@ -130,8 +131,7 @@ function drawMap(berlinData, londonData, nycData) {
 } // end drawMap()
 
 function addUI(map) {
-    var $ulLeft = $('.output-left ul'),
-        $ulRight = $('.output-right ul'),
+
         hovering = true;
     
     map.on("mousemove", function(e) {
@@ -142,20 +142,7 @@ function addUI(map) {
             }, function (err, features) {
 
                 if (!err && features.length) {
-
-                map.setFilter(currentDomain+"-hover", ["==", "hex_id", features[0].properties.hex_id]);
-
-                $ulLeft.html('');
-                $ulRight.html('');
-
-                for(var i = 0; i < features[0].properties.domains.length; i++) {
-                    // split the output left and right
-                    if(i % 2 == 0) {
-                        $ulLeft.append('<li>'+colorDomain(features[0].properties.domains[i])+'</li>');
-                    } else {
-                        $ulRight.append('<li>'+colorDomain(features[0].properties.domains[i])+'</li>');
-                    } 
-                }
+                    retrieveInfo(features);
 
                 } else {
                     $ulLeft.html('');
@@ -165,16 +152,18 @@ function addUI(map) {
         } // end if hovering
     }); // end on mouse move
 
-  map.on("click", function(e) {
+  map.on("mouseup", function(e) {
      map.featuresAt(e.point, {
       radius: .1,
       layer: ["berlin-hex", "london-hex", "nyc-hex"]
     }, function (err, features) {
 
         if (!err && features.length) {
+          
           if(!hovering) {
             hovering = true;
           } else {
+            retrieveInfo(features);
             hovering = false;
           }
         }
@@ -182,6 +171,22 @@ function addUI(map) {
   });   
     
 } // end addUI
+
+function retrieveInfo(features) {
+    map.setFilter(currentDomain+"-hover", ["==", "hex_id", features[0].properties.hex_id]);
+
+    $ulLeft.html('');
+    $ulRight.html('');
+
+    for(var i = 0; i < features[0].properties.domains.length; i++) {
+        // split the output left and right
+        if(i % 2 == 0) {
+            $ulLeft.append('<li>'+colorDomain(features[0].properties.domains[i])+'</li>');
+        } else {
+            $ulRight.append('<li>'+colorDomain(features[0].properties.domains[i])+'</li>');
+        } 
+    }
+}
 
 function colorDomain(tin) {
 
