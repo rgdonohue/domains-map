@@ -18,6 +18,9 @@ function map() {
     map.addControl(new mapboxgl.Navigation({position: 'top-left'}));
 
     map.on('style.load', function () {
+        
+        $('#loader').remove();
+        
         map.flyTo({
             center: [ -73.989, 40.734],
             zoom: 11.89
@@ -132,9 +135,10 @@ function drawMap(berlinData, londonData, nycData) {
 
 function addUI(map) {
 
-        hovering = true;
+    var hovering = true;
     
     map.on("mousemove", function(e) {
+        
         if(hovering) {
             map.featuresAt(e.point, {
                 radius: .1,
@@ -152,18 +156,18 @@ function addUI(map) {
         } // end if hovering
     }); // end on mouse move
 
-  map.on("mouseup", function(e) {
+  map.on("click", function(e) {
+     
      map.featuresAt(e.point, {
       radius: .1,
       layer: ["berlin-hex", "london-hex", "nyc-hex"]
     }, function (err, features) {
 
         if (!err && features.length) {
-          
+          retrieveInfo(features);
           if(!hovering) {
             hovering = true;
           } else {
-            retrieveInfo(features);
             hovering = false;
           }
         }
@@ -206,9 +210,9 @@ function colorDomain(tin) {
 
 function addNavigation(map) {
     
-    $('#nyc').fadeIn(2000, function() {
-        $('#london').fadeIn(300, function() {
-            $('#berlin').fadeIn(300);
+    $('#nyc').fadeIn(1400, function() {
+        $('#london').fadeIn(800, function() {
+            $('#berlin').fadeIn(800);
         });
     });
 
@@ -217,11 +221,6 @@ function addNavigation(map) {
             center: [-73.989, 40.734],
             zoom: 11.89
         });
-        map.fitBounds(map.getBounds(), {
-            maxZoom: 14
-        });
-        
-        map.setLayerZoomRange('nyc-hex', 10, 14);
 
         currentDomain = 'nyc';
         $('#london').addClass('button-opaque');

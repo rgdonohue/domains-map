@@ -16,6 +16,7 @@ h1 {
     margin: 0;
     max-width: 40%;
     font-family: "Jacques Francois Shadow", "Josefin Slab", serif; 
+    display: none;
 }
 h2 {
     font-size: 1.55em;
@@ -70,13 +71,13 @@ h2:hover {
     margin-bottom: 1.8em;
 }
 .nyc {
-    color: #0a7fcb;
+    color: #ba1d1a;
 }
 .berlin {
-    color: rgb(217, 34, 31);
+    color: #0861a1;
 }
 .london {
-    color: rgb(215, 151, 40);
+    color: #d79728;
 }
 .domain {
   opacity: .8;
@@ -95,7 +96,7 @@ svg {
     cursor: pointer;
 }
 
-/*        NAVIGATION BUTTONS*/
+/* NAVIGATION BUTTONS */
 button {
     position: absolute;
     z-index: 2;
@@ -107,7 +108,7 @@ button {
     font-family: "Special Elite", sans-serif;
     color: floralwhite;
     top: 56px;
-    transition: opacity 0.07s ease;
+/*    transition: opacity 0.07s ease;*/
     display: none;
 }
 button:hover {
@@ -116,28 +117,46 @@ button:hover {
 }
 #nyc {
     right: 260px;
-    background: rgb(7, 79, 130);
+    background: #ba1d1a;
 }
 #nyc:hover {
-  background: rgb(8, 95, 157);
+  background: #db221f;
 }
 #london {
     right: 140px;
-    background: rgb(199, 141, 10);
+    background: #d79728;
 }
 #london:hover {
-    background: rgb(215, 151, 40);
+    background: #e8a32b;
 }
 #berlin {
     right: 20px;
-    background: rgb(195, 30, 28);
+    background: #0861a1;
 }
 #berlin:hover {
-  background: rgb(217, 34, 31);
+  background: #0a76c4;
 }
 .button-opaque {
   transition: opacity 1s ease;
   opacity: .3;
 }
 
+/* LOADER */
 
+#loader {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: url(../images/dark_wall.png);
+    z-index: 200;
+}
+
+#loader img {
+    width: 72px;
+    height: 72px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: -36px 0 0 -36px;
+}
