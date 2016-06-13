@@ -142,7 +142,7 @@ function addUI(map) {
         if(hovering) {
             map.featuresAt(e.point, {
                 radius: .1,
-                layer: ["berlin-hex", "london-hex", "nyc-hex"]
+                layers: ["berlin-hex", "london-hex", "nyc-hex"]
             }, function (err, features) {
 
                 if (!err && features.length) {
